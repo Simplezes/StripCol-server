@@ -3,6 +3,7 @@ import fastify, { FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { squawkRoutes } from './routes/squawklog.js';
 import { clearanceRoutes } from './routes/clearancelog.js';
+import { filesRoutes } from './routes/files.js';
 
 export function buildApp(): FastifyInstance {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -23,7 +24,7 @@ export function buildApp(): FastifyInstance {
   app.register(sensible);
 
   app.addHook('onRequest', async (request, reply) => {
-    if (request.url === '/') return;
+    if (request.url === '/' || request.url.startsWith('/files/')) return;
 
     const apiKey = request.headers['x-api-key'];
     if (!apiKey || typeof apiKey !== 'string') {
@@ -48,6 +49,7 @@ export function buildApp(): FastifyInstance {
 
   app.register(squawkRoutes);
   app.register(clearanceRoutes);
+  app.register(filesRoutes);
 
   app.get('/', async () => {
     return { status: 'ok', version: '1.0.0', message: 'StripCol Server is running' };
