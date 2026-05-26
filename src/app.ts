@@ -11,14 +11,14 @@ export function buildApp(): FastifyInstance {
     logger: isProduction
       ? true
       : {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            translateTime: 'HH:MM:ss Z',
-            ignore: 'pid,hostname',
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname',
+            },
           },
         },
-      },
   });
 
   app.register(sensible);

@@ -8,7 +8,7 @@ export const clearanceRoutes: FastifyPluginAsync = async (fastify: FastifyInstan
         type: 'object',
         required: ['callsign', 'status'],
         properties: {
-          callsign: { type: 'string', minLength: 3, maxLength: 8 },
+          callsign: { type: 'string', minLength: 3, maxLength: 8, pattern: '^[A-Za-z0-9]{3,8}$' },
           status: { type: 'boolean' },
         },
       },
@@ -18,7 +18,9 @@ export const clearanceRoutes: FastifyPluginAsync = async (fastify: FastifyInstan
 
       await clearanceService.set(callsign, status);
 
-      return reply.code(201).send({ status: 'saved', callsign, value: status });
+      return reply
+        .code(201)
+        .send({ status: 'saved', callsign: callsign.toUpperCase(), value: status });
     },
   });
 

@@ -1,6 +1,32 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { buildApp } from '../src/app.js';
 import { FastifyInstance } from 'fastify';
+
+const { squawkStore, clearanceStore } = vi.hoisted(() => ({
+  squawkStore: [] as { code: string; createdAt: string }[],
+  clearanceStore: new Map<string, boolean>(),
+}));
+
+vi.mock('../src/services/store.service.js', () => ({
+  squawkService: {
+    set: vi.fn(async (code: string) => {
+      const createdAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      squawkStore.push({ code, createdAt });
+      return createdAt;
+    }),
+    getAll: vi.fn(async () => [...squawkStore]),
+    cleanup: vi.fn(async () => {}),
+  },
+  clearanceService: {
+    set: vi.fn(async (callsign: string, status: boolean) => {
+      clearanceStore.set(callsign.toUpperCase(), status);
+    }),
+    getAll: vi.fn(async () =>
+      Array.from(clearanceStore.entries()).map(([callsign, status]) => ({ callsign, status }))
+    ),
+    cleanup: vi.fn(async () => {}),
+  },
+}));
 
 describe('Logs Integration', () => {
   let app: FastifyInstance;
@@ -12,6 +38,11 @@ describe('Logs Integration', () => {
 
   afterAll(async () => {
     await app.close();
+  });
+
+  beforeEach(() => {
+    squawkStore.length = 0;
+    clearanceStore.clear();
   });
 
   describe('SquawkLog', () => {

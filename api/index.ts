@@ -1,8 +1,10 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { FastifyInstance } from 'fastify';
 import { buildApp } from '../src/app.js';
 
-let app: any;
+let app: FastifyInstance | null = null;
 
-export default async (req: any, res: any) => {
+export default async (req: IncomingMessage, res: ServerResponse) => {
   try {
     if (!app) {
       app = buildApp();

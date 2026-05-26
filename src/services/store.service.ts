@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { squawkLogs, clearanceLogs } from '../db/schema.js';
-import { eq, gt, sql } from 'drizzle-orm';
+import { gt, lt } from 'drizzle-orm';
 
 export const squawkService = {
   async set(code: string): Promise<string> {
@@ -28,7 +28,7 @@ export const squawkService = {
 
   async cleanup(): Promise<void> {
     const now = Math.floor(Date.now() / 1000);
-    await db.delete(squawkLogs).where(sql`${squawkLogs.expiresAt} < ${now}`);
+    await db.delete(squawkLogs).where(lt(squawkLogs.expiresAt, now));
   },
 };
 
@@ -62,6 +62,6 @@ export const clearanceService = {
 
   async cleanup(): Promise<void> {
     const now = Math.floor(Date.now() / 1000);
-    await db.delete(clearanceLogs).where(sql`${clearanceLogs.expiresAt} < ${now}`);
+    await db.delete(clearanceLogs).where(lt(clearanceLogs.expiresAt, now));
   },
 };

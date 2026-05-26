@@ -1,6 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { buildApp } from '../src/app.js';
 import { FastifyInstance } from 'fastify';
+
+vi.mock('../src/services/store.service.js', () => ({
+  squawkService: { set: vi.fn(), getAll: vi.fn(async () => []), cleanup: vi.fn() },
+  clearanceService: { set: vi.fn(), getAll: vi.fn(async () => []), cleanup: vi.fn() },
+}));
 
 describe('App Root', () => {
   let app: FastifyInstance;
